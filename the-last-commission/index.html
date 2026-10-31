@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>The Last Commission</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Game concept: The Last Commission, a first-person blacksmithing horror game.">
+<style>
+/* Layout: one narrow reading column, like a smith's ledger, broken by full-width illustrated "plates" drawn by firelight. Single dark look by choice: this page is the cabin at night. */
+:root {
+  --soot: #0e0d0c;      /* page ground */
+  --ash: #171513;       /* plate ground */
+  --umber: #2b241e;     /* rules, borders */
+  --bone: #ddd3c4;      /* body text */
+  --dust: #948a7d;      /* secondary text */
+  --heat: #ff8a2a;      /* hot metal: the only saturated colour */
+  --heat-dim: #b5481a;
+  --blood: #8e1c1c;
+  --moon: #8798a6;      /* cold outside light */
+  --display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --display-i: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --body: Georgia, "Times New Roman", serif;
+  --mono: ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace;
+  --rune: "Segoe UI Historic", "Noto Sans Runic", serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--soot);
+  color: var(--bone);
+  font-family: var(--body);
+  font-size: 1.12rem;
+  line-height: 1.62;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 4rem;
+}
+.col { max-width: 46rem; margin-inline: auto; }
+.wide { max-width: 68rem; margin-inline: auto; }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; color: var(--bone); margin: 0; }
+h2 { font-size: clamp(1.9rem, 4.5vw, 2.6rem); line-height: 1.1; }
+h3 { font-size: 1.3rem; line-height: 1.2; }
+p { margin: 0; }
+em { color: var(--bone); }
+a { color: var(--heat); }
+.label { font-family: var(--mono); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--dust); }
+.rune { font-family: var(--rune); color: var(--blood); letter-spacing: .5em; }
+section { padding-block: 4.5rem 0; display: grid; gap: 1.4rem; }
+.lede { font-size: 1.28rem; color: var(--bone); }
+.muted { color: var(--dust); }
+.stack { display: grid; gap: 1rem; }
+
+/* ---------- Hero ---------- */
+.hero { padding-block: 2.5rem 0; display: grid; gap: 1.6rem; }
+.hero-art { position: relative; border: 1px solid var(--umber); background: var(--ash); overflow: hidden; }
+.hero-art svg { display: block; width: 100%; height: auto; }
+.hero h1 { font-variant: small-caps; font-size: clamp(2.8rem, 9vw, 5.6rem); line-height: .95; letter-spacing: .01em; }
+.hero h1 span { color: var(--heat); text-shadow: 0 0 22px rgba(255,138,42,.45); }
+.pitch { font-family: var(--display-i); font-style: italic; font-size: clamp(1.25rem, 2.6vw, 1.55rem); line-height: 1.45; color: var(--bone); max-width: 40rem; }
+.status { display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+
+/* ---------- Identity table ---------- */
+.ledger { width: 100%; border-collapse: collapse; font-size: 1rem; }
+.ledger th, .ledger td { text-align: left; vertical-align: top; padding: .7rem 0; border-bottom: 1px solid var(--umber); }
+.ledger th { font-family: var(--mono); font-weight: 400; font-size: .74rem; letter-spacing: .12em; text-transform: uppercase; color: var(--dust); width: 34%; padding-right: 1rem; }
+
+/* ---------- Pull quote / hook ---------- */
+.hook { border-left: 2px solid var(--heat-dim); padding: .3rem 0 .3rem 1.3rem; font-family: var(--display-i); font-size: 1.35rem; line-height: 1.45; }
+.trio { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1.6rem; }
+.trio > div { display: grid; gap: .5rem; align-content: start; min-width: 0; }
+.trio svg { width: 100%; height: auto; max-width: 100%; }
+
+/* ---------- Plates (illustrations) ---------- */
+.plate { background: var(--ash); border: 1px solid var(--umber); padding: 1.4rem; display: grid; gap: 1rem; }
+.plate svg { width: 100%; height: auto; display: block; }
+.caption { font-family: var(--mono); font-size: .78rem; color: var(--dust); line-height: 1.5; }
+.scroll-x { overflow-x: auto; }
+
+/* ---------- Forging chain ---------- */
+.chain { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: step; }
+.chain li { display: grid; grid-template-columns: 2.6rem 1fr auto; gap: 1rem; align-items: baseline; padding: .85rem 0; border-bottom: 1px solid var(--umber); counter-increment: step; }
+.chain li::before { content: counter(step, upper-roman); font-family: var(--display); color: var(--dust); font-size: 1.05rem; }
+.chain b { font-family: var(--display); font-weight: 400; font-size: 1.15rem; color: var(--bone); display: block; }
+.chain span.d { color: var(--dust); font-size: .98rem; }
+.chain .t { font-family: var(--mono); font-size: .78rem; white-space: nowrap; padding: .15rem .5rem; border: 1px solid var(--umber); color: var(--bone); }
+.chain .t.hot { color: #1a0d05; border-color: transparent; }
+.chain li > div { min-width: 0; }
+
+/* ---------- Pillars ---------- */
+.pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr)); gap: 1px; background: var(--umber); border: 1px solid var(--umber); }
+.pillar { background: var(--soot); padding: 1.5rem; display: grid; gap: .7rem; align-content: start; min-width: 0; }
+.pillar .n { font-family: var(--rune); color: var(--heat-dim); font-size: 1.6rem; line-height: 1; }
+.pillar .test { font-size: .95rem; color: var(--dust); border-top: 1px dashed var(--umber); padding-top: .7rem; }
+.pillar .test b { color: var(--bone); font-weight: 600; }
+.anti { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
+.anti li { display: grid; grid-template-columns: 1.4rem 1fr; gap: .6rem; }
+.anti li::before { content: "ᛁ"; font-family: var(--rune); color: var(--blood); }
+.anti b { font-weight: 600; }
+
+/* ---------- Nights timeline ---------- */
+.nights { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: .4rem; }
+.night { border: 1px solid var(--umber); padding: .7rem .5rem; display: grid; gap: .35rem; align-content: start; min-height: 9.5rem; position: relative; background: var(--soot); }
+.night .k { font-family: var(--mono); font-size: .68rem; color: var(--dust); letter-spacing: .1em; }
+.night .w { font-family: var(--display); font-size: 1rem; line-height: 1.15; }
+.night .c { font-size: .82rem; color: var(--dust); line-height: 1.35; }
+.night.armor { border-color: #4a2a22; }
+.curse { height: 6px; background: linear-gradient(90deg, #2b241e 0%, #4a2020 55%, var(--blood) 100%); }
+@media (max-width: 760px) {
+  .nights { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .night { min-height: 0; }
+}
+
+/* ---------- Tiers ---------- */
+.tiers { display: grid; gap: .9rem; }
+.tier { display: grid; grid-template-columns: 7rem 1fr; gap: 1rem; align-items: center; }
+.tier .name { font-family: var(--display); font-size: 1.1rem; }
+.bar-track { position: relative; height: 1.9rem; border: 1px solid var(--umber); background: var(--soot); }
+.bar { position: absolute; inset: 0 auto 0 0; display: flex; align-items: center; padding-left: .6rem; font-family: var(--mono); font-size: .74rem; color: var(--bone); white-space: nowrap; }
+.tier-desc { grid-column: 2; font-size: .95rem; color: var(--dust); margin-top: -.4rem; }
+.axis { display: grid; grid-template-columns: 7rem 1fr; gap: 1rem; }
+.axis div:last-child { display: flex; justify-content: space-between; font-family: var(--mono); font-size: .7rem; color: var(--dust); font-variant-numeric: tabular-nums; }
+@media (max-width: 520px) {
+  .tier, .axis { grid-template-columns: 1fr; gap: .4rem; }
+  .tier-desc { grid-column: 1; margin-top: 0; }
+  .axis div:first-child { display: none; }
+}
+
+/* ---------- Two-column lists ---------- */
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 2rem; }
+.cols > div { display: grid; gap: .8rem; align-content: start; min-width: 0; }
+ul.plain { margin: 0; padding-left: 1.1rem; display: grid; gap: .45rem; }
+ul.plain li::marker { color: var(--heat-dim); }
+.verdict { display: inline-block; font-family: var(--mono); font-size: .72rem; letter-spacing: .1em; padding: .15rem .5rem; border: 1px solid currentColor; }
+.v-warn { color: #d9a441; }
+.v-ok { color: #8fae7e; }
+
+.refs { width: 100%; border-collapse: collapse; font-size: .98rem; min-width: 36rem; }
+.refs th, .refs td { text-align: left; vertical-align: top; padding: .65rem .8rem .65rem 0; border-bottom: 1px solid var(--umber); }
+.refs th { font-family: var(--mono); font-weight: 400; font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--dust); }
+.refs td:first-child { font-family: var(--display); font-size: 1.05rem; white-space: nowrap; }
+
+.steps { margin: 0; padding-left: 1.4rem; display: grid; gap: .5rem; }
+.steps code { font-family: var(--mono); font-size: .9rem; color: var(--heat); }
+footer { padding-block: 4rem 0; }
+footer .col { border-top: 1px solid var(--umber); padding-top: 1.4rem; display: grid; gap: .6rem; }
+
+/* ---------- Photos: graded toward the cabin at night ---------- */
+.photo { position: relative; margin: 0; overflow: hidden; background: var(--ash); border: 1px solid var(--umber); }
+.photo img { display: block; width: 100%; height: 100%; object-fit: cover; filter: brightness(.62) contrast(1.12) saturate(.55) sepia(.12); }
+.photo::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 45%, rgba(14,13,12,.85) 100%); }
+.photo.hot img { filter: brightness(.7) contrast(1.15) saturate(.8); }
+.photo.museum img { filter: brightness(.42) contrast(1.35) saturate(.3) sepia(.2); }
+.hero-photo { aspect-ratio: 21 / 9; }
+.hero-photo::after { background: radial-gradient(ellipse at 50% 40%, transparent 30%, rgba(14,13,12,.9) 100%), linear-gradient(transparent 60%, var(--soot)); }
+.trio .photo { aspect-ratio: 16 / 10; }
+.wide-photo { aspect-ratio: 16 / 7; }
+.side { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 1.6rem; align-items: start; }
+.side .photo { aspect-ratio: 3 / 4; }
+@media (max-width: 640px) { .side { grid-template-columns: 1fr; } .hero-photo { aspect-ratio: 4 / 3; } }
+figcaption { font-family: var(--mono); font-size: .74rem; color: var(--dust); padding-top: .5rem; }
+.changes { margin: 0; padding-left: 1.1rem; display: grid; gap: .5rem; }
+.changes li::marker { color: var(--blood); }
+
+/* ---------- Motion ---------- */
+@keyframes flicker { 0%,100% { opacity: .85; } 40% { opacity: 1; } 60% { opacity: .72; } }
+.glow { animation: flicker 3.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .glow { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="wide hero">
+  <figure class="photo hero-photo"><img src="img/forest.jpg" alt="A dark, foggy spruce forest with a narrow path leading between the trees."></figure>
+  <div class="col stack">
+    <div class="status">
+      <span class="label">Game concept · draft</span>
+      <span class="label">PC · Steam · Unity</span>
+      <span class="label">31 Oct 2026</span>
+    </div>
+    <h1>The Last <span>Commission</span></h1>
+    <p class="pitch">A first-person blacksmithing horror game. Each night a stranger brings one order. Forge it as perfectly as you can, and he promises you will see your wife and daughter again. The runes he teaches you are blood magic, and every perfect piece makes the cabin a little more wrong.</p>
+  </div>
+</header>
+
+<main>
+<section class="col">
+  <span class="label">Core identity</span>
+  <table class="ledger">
+    <tr><th>Genre</th><td>First-person crafting simulator with slow-dread folk horror</td></tr>
+    <tr><th>Platform</th><td>PC (Steam). Mouse and keyboard first, controller optional</td></tr>
+    <tr><th>Players</th><td>Single-player</td></tr>
+    <tr><th>Session</th><td>30–60 minutes. One night, one commission</td></tr>
+    <tr><th>Price model</th><td>Premium, one-time purchase</td></tr>
+    <tr><th>Scope</th><td>Large: 10–12 months to the Ship tier, team of 2–3</td></tr>
+    <tr><th>Closest games</th><td>The Mortuary Assistant, Dredge, Papers, Please</td></tr>
+  </table>
+</section>
+
+<section class="col">
+  <span class="label">The fantasy</span>
+  <h2>A craftsman whose skill is the only thing between him and grief</h2>
+  <p class="lede">You are an old blacksmith, alone in a cabin deep in a dark forest. Your hands still remember the craft. At dusk a tall stranger knocks, hands you an order marked with runes, and leaves. If every piece is perfect, he says, you will see your family again.</p>
+  <figure class="photo wide-photo"><img src="img/cabin.jpg" alt="A low, snow-covered log cabin among birch and spruce trees." loading="lazy"><figcaption>A trapper's cabin like the smith's: low, old, and too far from anyone.</figcaption></figure>
+  <p>Around the cabin, things happen that have no explanation. Dark shapes stand between the trees. Sounds come from the wrong side of the wall. Sometimes something looks in through the window. You keep working, because the metal is hot and the promise is the only thing you have left.</p>
+  <blockquote class="hook">Like <em>The Mortuary Assistant</em>, but the procedure is real blacksmithing, and the metal keeps cooling while the horror pulls your eyes away. Your mistakes don't fail the night. They let something in.</blockquote>
+</section>
+
+<section class="wide">
+  <div class="col stack">
+    <span class="label">Three things that make it different</span>
+  </div>
+  <div class="trio">
+    <div>
+      <figure class="photo hot"><img src="img/hammering.jpg" alt="A blacksmith hammers a glowing red bar over the horn of an anvil." loading="lazy"></figure>
+      <h3>The metal won't wait</h3>
+      <p class="muted">Heat colour is a real-time clock. A knock at the door costs you a heat. You choose between the metal and the dark, every time.</p>
+    </div>
+    <div>
+      <figure class="photo"><img src="img/runestone.jpg" alt="The Asferg runestone, its carved runes painted red." loading="lazy"></figure>
+      <h3>Perfection is paid in blood</h3>
+      <p class="muted">The stranger's runes are forbidden blood magic. Inscribing them means cutting your own hand. The cost carries forward, and every rune deepens the curse on the cabin.</p>
+    </div>
+    <div>
+      <figure class="photo museum"><img src="img/helm.jpg" alt="A 16th-century close helmet with its visor shut." loading="lazy"></figure>
+      <h3>The armor you make is alive</h3>
+      <p class="muted">Piece by piece you forge a full suit. As it nears completion it turns its head toward you, stands where you didn't leave it, and sometimes is gone.</p>
+    </div>
+  </div>
+</section>
+
+<section class="col">
+  <span class="label">The craft</span>
+  <h2>Real smithing, step by step</h2>
+  <p>Steel weapons were never poured into a mould. Metal is melted into an ingot, and the shape comes from hammering at the right heat. Each step below is a physical mouse gesture, and each one can be done well or badly. That is the rule from Pillar 1: a step without a decision or a risk gets compressed.</p>
+  <figure class="photo hot wide-photo"><img src="img/anvil.jpg" alt="A smith holds glowing metal on an anvil with tongs and strikes it with a hammer; sparks fly." loading="lazy"><figcaption>Tongs, hammer, anvil: the work in the player's hands.</figcaption></figure>
+  <ol class="chain">
+    <li><div><b>Melt and pour the ingot</b><span class="d">Pump the bellows, read the glow, pour the crucible into the ingot mould without spilling.</span></div><span class="t hot" style="background:#fff3c4">~1500 °C</span></li>
+    <li><div><b>Heat to forging colour</b><span class="d">Pull the bar from the coals when it reads orange to yellow. Too cold cracks; too hot burns the steel.</span></div><span class="t hot" style="background:#ffb03a">900–1100 °C</span></li>
+    <li><div><b>Hammer the shape</b><span class="d">Timed, aimed swings. Draw out the length, set the bevels, form the tip. Every strike visibly moves the metal.</span></div><span class="t hot" style="background:#ff8a2a">until cherry</span></li>
+    <li><div><b>Normalize</b><span class="d">Heat and let it cool in air to relieve stress. Compressed to one gesture and a wait.</span></div><span class="t hot" style="background:#d8502a">~800 °C</span></li>
+    <li><div><b>Harden: the magnet test</b><span class="d">Heat until a magnet no longer sticks. That is the moment to quench.</span></div><span class="t hot" style="background:#c2391a">~770 °C</span></li>
+    <li><div><b>Quench</b><span class="d">Plunge it in water (fast, risks a crack) or oil (safer). A critical window: the horror is allowed to interrupt here.</span></div><span class="t">water / oil</span></li>
+    <li><div><b>Temper</b><span class="d">Reheat gently and watch the oxide colours creep along the blade. Stop at the right band.</span></div><span class="t hot" style="background:#c9a25a">200–300 °C</span></li>
+    <li><div><b>Grind and sharpen</b><span class="d">The grindstone. Even pressure, the right angle.</span></div><span class="t">cold</span></li>
+    <li><div><b>Assemble</b><span class="d">Guard, grip and pommel; rivets for armor plates.</span></div><span class="t">cold</span></li>
+    <li><div><b>Inscribe the runes</b><span class="d">Cut your hand. Follow the stranger's sketch with the chisel and the blood. The house hears it.</span></div><span class="t" style="color:#d06060;border-color:#5a1e1e">blood</span></li>
+  </ol>
+  <p class="muted">Armor swaps the middle steps for <em>raising</em>: dishing a flat plate over a stake into a curved helm or breastplate, then riveting the pieces together.</p>
+</section>
+
+<section class="wide">
+  <div class="col stack">
+    <span class="label">Reading the heat</span>
+    <h2>Colour is the only clock</h2>
+    <p>The smith has no thermometer. He reads the metal. These are the real colours a blacksmith uses, and the game's heat shader follows them. Heat also grows brighter as it climbs, so players with colour blindness can read it by brightness. Sound gives a second cue.</p>
+  </div>
+  <div class="plate">
+    <div class="scroll-x">
+      <svg viewBox="0 0 1000 200" role="img" aria-label="Heat colour scale from dull red at 550 degrees to white at 1300 degrees Celsius, with the forging range, the magnet test point and the danger zones marked.">
+        <defs>
+          <linearGradient id="ramp" x1="0" x2="1">
+            <stop offset="0" stop-color="#3a0e08"/>
+            <stop offset=".18" stop-color="#7a1a0e"/>
+            <stop offset=".32" stop-color="#b8301a"/>
+            <stop offset=".45" stop-color="#e0552a"/>
+            <stop offset=".6" stop-color="#ff8a2a"/>
+            <stop offset=".75" stop-color="#ffbe4a"/>
+            <stop offset=".88" stop-color="#ffe9a0"/>
+            <stop offset="1" stop-color="#fffaf0"/>
+          </linearGradient>
+        </defs>
+        <!-- scale: 500 °C at x=40, 1300 °C at x=960; 1.15 px per °C -->
+        <rect x="40" y="70" width="920" height="40" fill="url(#ramp)"/>
+        <g font-family="Consolas, Menlo, monospace" font-size="12" fill="#948a7d" text-anchor="middle">
+          <line x1="40" y1="110" x2="40" y2="120" stroke="#948a7d"/><text x="40" y="136">500</text>
+          <line x1="155" y1="110" x2="155" y2="120" stroke="#948a7d"/><text x="155" y="136">600</text>
+          <line x1="270" y1="110" x2="270" y2="120" stroke="#948a7d"/><text x="270" y="136">700</text>
+          <line x1="385" y1="110" x2="385" y2="120" stroke="#948a7d"/><text x="385" y="136">800</text>
+          <line x1="500" y1="110" x2="500" y2="120" stroke="#948a7d"/><text x="500" y="136">900</text>
+          <line x1="615" y1="110" x2="615" y2="120" stroke="#948a7d"/><text x="615" y="136">1000</text>
+          <line x1="730" y1="110" x2="730" y2="120" stroke="#948a7d"/><text x="730" y="136">1100</text>
+          <line x1="845" y1="110" x2="845" y2="120" stroke="#948a7d"/><text x="845" y="136">1200</text>
+          <line x1="960" y1="110" x2="960" y2="120" stroke="#948a7d"/><text x="960" y="136">1300 °C</text>
+        </g>
+        <g font-family="Palatino Linotype, Palatino, Georgia, serif" font-size="15" fill="#ddd3c4" text-anchor="middle">
+          <text x="125" y="58">dull red</text>
+          <text x="328" y="58">cherry</text>
+          <text x="557" y="58">orange</text>
+          <text x="730" y="58">yellow</text>
+          <text x="915" y="58">white</text>
+        </g>
+        <!-- magnet test 770 -->
+        <line x1="350" y1="64" x2="350" y2="116" stroke="#ddd3c4" stroke-width="2" stroke-dasharray="3 3"/>
+        <text x="350" y="160" text-anchor="middle" font-family="Consolas, Menlo, monospace" font-size="11" fill="#ddd3c4">magnet lets go ~770</text>
+        <!-- forging range 900-1100 -->
+        <rect x="500" y="146" width="230" height="6" fill="#ff8a2a"/>
+        <text x="615" y="176" text-anchor="middle" font-family="Consolas, Menlo, monospace" font-size="11" fill="#ff8a2a">forging range</text>
+        <!-- danger: below 700 cracks, above 1200 burns -->
+        <rect x="40" y="146" width="230" height="6" fill="#5a1e1e"/>
+        <text x="155" y="176" text-anchor="middle" font-family="Consolas, Menlo, monospace" font-size="11" fill="#d06060">too cold: strikes crack it</text>
+        <rect x="845" y="146" width="115" height="6" fill="#5a1e1e"/>
+        <text x="902" y="176" text-anchor="middle" font-family="Consolas, Menlo, monospace" font-size="11" fill="#d06060">burns the steel</text>
+      </svg>
+    </div>
+    <div class="scroll-x">
+      <svg viewBox="0 0 1000 120" role="img" aria-label="Tempering colours on a blade: pale straw at 200, straw at 220, bronze at 250, purple at 270, blue at 300 degrees Celsius.">
+        <text x="40" y="22" font-family="Consolas, Menlo, monospace" font-size="12" fill="#948a7d" letter-spacing="2">TEMPERING: OXIDE COLOURS CREEP ALONG THE BLADE</text>
+        <path d="M40 44 H880 L960 64 L880 84 H40 Z" fill="#6f6a64"/>
+        <rect x="40" y="44" width="170" height="40" fill="#e9dcae"/>
+        <rect x="210" y="44" width="170" height="40" fill="#cfa85a"/>
+        <rect x="380" y="44" width="170" height="40" fill="#9a6232"/>
+        <rect x="550" y="44" width="170" height="40" fill="#6a3a6e"/>
+        <rect x="720" y="44" width="160" height="40" fill="#2f4a8a"/>
+        <g font-family="Consolas, Menlo, monospace" font-size="11" fill="#ddd3c4" text-anchor="middle">
+          <text x="125" y="106">pale straw 200 °C</text>
+          <text x="295" y="106">straw 220 °C</text>
+          <text x="465" y="106">bronze 250 °C</text>
+          <text x="635" y="106">purple 270 °C</text>
+          <text x="800" y="106">blue 300 °C</text>
+        </g>
+      </svg>
+    </div>
+    <p class="caption">Temperatures are approximate for plain carbon steel. Harder edges stop at straw; springy blades and armor go toward blue. The position of the colour band along the blade is the second cue for colour-blind players.</p>
+  </div>
+</section>
+
+<section class="wide">
+  <div class="col stack">
+    <span class="label">The heart of the loop</span>
+    <h2>The metal or the dark</h2>
+    <p>The real core loop is a dilemma. While a piece is in a critical window, something happens. Look away and the metal cools. Keep working and the thing you ignored gets worse. Ignoring the horror costs as much as ignoring the metal.</p>
+  </div>
+  <div class="plate">
+    <div class="scroll-x">
+      <svg viewBox="0 0 1000 260" role="img" aria-label="Timeline of one quench window: the bar cools as a knock is heard; two branches show the cost of looking away (lost heat) versus the cost of ignoring it (the haunting escalates).">
+        <defs>
+          <linearGradient id="coolLine" x1="0" x2="1">
+            <stop offset="0" stop-color="#ffbe4a"/><stop offset=".5" stop-color="#ff8a2a"/><stop offset="1" stop-color="#5a1a10"/>
+          </linearGradient>
+        </defs>
+        <text x="40" y="30" font-family="Consolas, Menlo, monospace" font-size="12" fill="#948a7d" letter-spacing="2">ONE QUENCH WINDOW · ABOUT 20 SECONDS</text>
+        <rect x="40" y="60" width="920" height="14" fill="url(#coolLine)"/>
+        <text x="40" y="96" font-family="Consolas, Menlo, monospace" font-size="11" fill="#948a7d">bar leaves the fire</text>
+        <text x="960" y="96" text-anchor="end" font-family="Consolas, Menlo, monospace" font-size="11" fill="#948a7d">too cold to harden</text>
+        <line x1="360" y1="48" x2="360" y2="120" stroke="#ddd3c4" stroke-width="2"/>
+        <text x="360" y="140" text-anchor="middle" font-family="Palatino Linotype, Palatino, Georgia, serif" font-size="18" fill="#ddd3c4">three knocks at the door</text>
+        <path d="M360 150 C 360 190, 220 190, 200 220" stroke="#8798a6" stroke-width="2" fill="none"/>
+        <path d="M360 150 C 360 190, 520 190, 560 220" stroke="#ff8a2a" stroke-width="2" fill="none"/>
+        <text x="200" y="244" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#8798a6">Go to the door: the bar drops below 770 °C</text>
+        <text x="600" y="244" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#ff8a2a">Keep quenching: tonight, something gets in</text>
+      </svg>
+    </div>
+    <p class="caption">Fairness rule: events only fire inside named critical windows (pour, quench, temper). Ordinary lost heat is recovered by reheating, at the cost of time.</p>
+  </div>
+</section>
+
+<section class="wide">
+  <div class="col stack">
+    <span class="label">Core loop</span>
+    <h2>From one hammer strike to eight nights</h2>
+  </div>
+  <div class="cols">
+    <div>
+      <svg viewBox="0 0 400 400" role="img" aria-label="Four nested rings: one heat inside one stage inside one night inside eight nights.">
+        <circle cx="200" cy="200" r="190" fill="none" stroke="#2b241e" stroke-width="2"/>
+        <circle cx="200" cy="200" r="140" fill="none" stroke="#3a2a22" stroke-width="2"/>
+        <circle cx="200" cy="200" r="90" fill="none" stroke="#5a2e1c" stroke-width="2"/>
+        <circle cx="200" cy="200" r="44" fill="#ff8a2a" class="glow"/>
+        <g font-family="Consolas, Menlo, monospace" font-size="12" text-anchor="middle">
+          <text x="200" y="204" fill="#1a0d05">30 sec</text>
+          <text x="200" y="128" fill="#d06a3a">5–15 min</text>
+          <text x="200" y="78" fill="#948a7d">30–60 min</text>
+          <text x="200" y="28" fill="#948a7d">8 nights</text>
+        </g>
+        <g font-family="Palatino Linotype, Palatino, Georgia, serif" font-size="15" fill="#ddd3c4" text-anchor="middle">
+          <text x="200" y="146">one stage</text>
+          <text x="200" y="96">one night</text>
+          <text x="200" y="46">the commission</text>
+        </g>
+      </svg>
+    </div>
+    <div>
+      <div class="stack">
+        <h3>One heat · 30 seconds</h3>
+        <p class="muted">Pull the bar at the right colour, strike with timed swings, watch it deform and ring. As it dulls, keep striking and risk a crack, or return it to the fire.</p>
+      </div>
+      <div class="stack">
+        <h3>One stage · 5–15 minutes</h3>
+        <p class="muted">Draw out a blade, raise a helm plate, harden and quench. Water or oil, one more heat, answer the scratch at the window or keep working.</p>
+      </div>
+      <div class="stack">
+        <h3>One night · 30–60 minutes</h3>
+        <p class="muted">The stranger arrives at dusk with the order and its rune sketch. Forge, bleed, inscribe, deliver. Better work brings back a clearer memory of the family.</p>
+      </div>
+      <div class="stack">
+        <h3>The commission · 8 nights</h3>
+        <p class="muted">Weapons first, to learn the craft. Then one suit of armor, piece by piece, that grows more alive as it nears completion. Two endings.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wide">
+  <div class="col stack">
+    <span class="label">The arc (Ship tier)</span>
+    <h2>Eight nights</h2>
+    <p>The story is written to an 8-night spine. Middle nights are modular, so a late cut still leaves a whole story. The order of pieces below is a working draft; the narrative comes later.</p>
+  </div>
+  <div class="nights">
+    <div class="night"><span class="k">NIGHT I</span><span class="w">Seax knife</span><span class="c">The craft is taught. The room is learned.</span></div>
+    <div class="night"><span class="k">NIGHT II</span><span class="w">Axe</span><span class="c">First rune in blood. A cup has moved.</span></div>
+    <div class="night"><span class="k">NIGHT III</span><span class="w">Sword</span><span class="c">Longer quench. A shape between the trees.</span></div>
+    <div class="night armor"><span class="k">NIGHT IV</span><span class="w">Helm</span><span class="c">Plate raising. The helm is placed on its stand.</span></div>
+    <div class="night armor"><span class="k">NIGHT V</span><span class="w">Breastplate</span><span class="c">The helm faces the bed now.</span></div>
+    <div class="night armor"><span class="k">NIGHT VI</span><span class="w">Gauntlets</span><span class="c">Your hand trembles from the cuts.</span></div>
+    <div class="night armor"><span class="k">NIGHT VII</span><span class="w">Greaves</span><span class="c">The stand is empty when you wake.</span></div>
+    <div class="night armor"><span class="k">NIGHT VIII</span><span class="w">The last rune</span><span class="c">The suit is complete. The stranger comes in.</span></div>
+  </div>
+  <div class="curse" aria-hidden="true"></div>
+  <p class="caption">The bar under the nights shows the curse deepening with every rune inscribed.</p>
+</section>
+
+<section class="col">
+  <span class="label">Pillars</span>
+  <h2>Four rules every decision obeys</h2>
+  <p class="muted">Reviewed by the creative director and revised before locking.</p>
+</section>
+<div class="wide" style="padding-top:1.4rem">
+  <div class="pillars">
+    <div class="pillar">
+      <span class="n">ᚺ</span>
+      <h3>The Hands Remember</h3>
+      <p>Every step is a physical gesture grounded in real smithing, and every gesture must carry a decision or a risk.</p>
+      <p class="test"><b>Test:</b> simulate this step, compress it, or cut it? Simulate it only if the player can do it well or badly.</p>
+    </div>
+    <div class="pillar">
+      <span class="n">ᛞ</span>
+      <h3>Dread, Not Fright</h3>
+      <p>Fear comes from wrongness in familiar things. Whatever appears is seen, but never close, never confronting, never explained.</p>
+      <p class="test"><b>Test:</b> when something is seen, does it hold still at a distance or move toward the player? It holds still.</p>
+    </div>
+    <div class="pillar">
+      <span class="n">ᛁ</span>
+      <h3>The Metal Won't Wait</h3>
+      <p>The forge never pauses for the horror, and the horror never waits for the forge. Ignoring the horror costs as much as ignoring the metal.</p>
+      <p class="test"><b>Test:</b> freeze the heat during an event, or let it cool? Let it cool.</p>
+    </div>
+    <div class="pillar">
+      <span class="n">ᛈ</span>
+      <h3>Perfection Is the Price</h3>
+      <p>Precision is rewarded with memories of the family, and the reward should feel suspect. Perfection is paid for in blood and in the curse.</p>
+      <p class="test"><b>Test:</b> does the game say a piece was perfect? Never directly. Does a flawed piece end the run? No; the house shows the cost.</p>
+    </div>
+  </div>
+</div>
+
+<section class="col">
+  <h3>What this game is not</h3>
+  <ul class="anti">
+    <li><span><b>No combat.</b> Fighting what's outside would turn dread into action.</span></li>
+    <li><span><b>No jump-scares or screamers.</b> No sudden loud sounds; horror sounds come from things in the room.</span></li>
+    <li><span><b>No click-to-craft menus.</b> The hands do the work.</span></li>
+    <li><span><b>No open world.</b> The forest is seen through the window, never roamed.</span></li>
+    <li><span><b>No cosmic gods, no full explanation.</b> Naming the thing kills the dread.</span></li>
+    <li><span><b>No game-over screen.</b> The night always ends, and the cost carries forward.</span></li>
+    <li><span><b>No shop or trading economy.</b> Tools change through the story.</span></li>
+  </ul>
+</section>
+
+<section class="wide">
+  <div class="col stack">
+    <span class="label">Visual identity · The Cabin Remembers Wrong</span>
+    <h2>Everything is real, until it isn't</h2>
+    <p>A grounded, naturalistic cabin full of domestic clutter, lit evenly enough to be searched. The horror is a continuity error: you can never point to the moment something changed. Compare the two nights below.</p>
+  </div>
+  <div class="plate">
+    <div class="side">
+      <figure class="photo museum"><img src="img/armor.jpg" alt="A full suit of 16th-century field armor standing on a round base." loading="lazy"><figcaption>The suit, as it might stand in the corner of the cabin.</figcaption></figure>
+      <div class="stack">
+        <h3>Night II, then Night V</h3>
+        <p class="muted">The same wall, three nights apart. Nothing jumps out. You notice later, and you are not sure.</p>
+        <ul class="changes">
+          <li>The cup has moved along the shelf.</li>
+          <li>A third, identical hammer hangs on the rack.</li>
+          <li>The wife's coat is gone from its peg.</li>
+          <li>The helm on its stand has turned to face the room.</li>
+          <li>The interior light has drifted slightly colder.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="cols">
+    <div>
+      <h3>The room is evidence</h3>
+      <p class="muted">Changes should make players doubt their own memory before they doubt the house. Test: dramatic or doubtful? Doubtful.</p>
+    </div>
+    <div>
+      <h3>Wrongness is regularity</h3>
+      <p class="muted">The hand-made world is crooked and organic. Wrongness arrives as too-straight lines, mirror symmetry and repeated identical objects. Test: grotesque or too perfect? Too perfect.</p>
+    </div>
+    <div>
+      <h3>Only the metal burns</h3>
+      <p class="muted">Hot metal is the most saturated thing on screen. Lamps and fire are pushed toward dull amber so they never read as heat. Blood is the only other strong red, used sparingly.</p>
+    </div>
+  </div>
+  <div class="col stack">
+    <p class="muted">The stranger only ever appears as a silhouette, a hand, a shadow in the doorway or a shape in the frosted window. Memories of the family look slightly too warm and too clean, as if they were forged too.</p>
+  </div>
+</section>
+
+<section class="col">
+  <span class="label">Who it's for</span>
+  <h2>Players who want dread, not noise</h2>
+  <p><b>Primary:</b> story and discovery players who come for the mystery and enjoy searching a room for what changed. <b>Secondary:</b> achievers and crafting fans who want the perfect piece and love real procedure.</p>
+  <p class="muted"><b>Not for:</b> action-horror fans who want chases and monsters, survival players looking for an economy and base-building, or streamers looking for jump-scare clips.</p>
+  <div class="scroll-x">
+    <table class="refs">
+      <tr><th>Reference</th><th>What we take</th><th>What we change</th></tr>
+      <tr><td>The Mortuary Assistant</td><td>A careful job as the vehicle for horror</td><td>No jump-scares; the job is real smithing with a heat clock</td></tr>
+      <tr><td>Dredge</td><td>Calm routine broken by wrongness</td><td>A physical, graded craft in a single room</td></tr>
+      <tr><td>Papers, Please</td><td>Precision as moral pressure; rewards that implicate you</td><td>The pressure is physical and real-time</td></tr>
+      <tr><td>Inscryption</td><td>A cabin, a stranger, rewards that are traps</td><td>Dread instead of a puzzle box</td></tr>
+      <tr><td>The Witch (film)</td><td>Folk-horror restraint, a family's grief, the forest as a presence</td><td>Told through work, not dialogue</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="col">
+  <span class="label">Scope</span>
+  <h2>What ships, and when</h2>
+  <p>Producer verdict: <span class="verdict v-warn">OPTIMISTIC</span>. The adjustments are applied here. Ship is the 10–12 month target; the full vision is a stretch goal or post-launch.</p>
+  <div class="tiers">
+    <div class="axis"><div></div><div><span>0</span><span>3</span><span>6</span><span>9</span><span>12 months</span></div></div>
+    <div class="tier"><span class="name">MVP</span><div class="bar-track"><div class="bar" style="width:41.7%;background:#5a2e1c">4–5 mo</div></div></div>
+    <p class="tier-desc">3 nights, one seax knife through the full chain, 6–8 horror events, one room with 8 changing props. Go or no-go at month 5.</p>
+    <div class="tier"><span class="name">Floor</span><div class="bar-track"><div class="bar" style="width:66.7%;background:#7a3a1c">7–8 mo</div></div></div>
+    <p class="tier-desc">5 nights, 2 weapons and the helm, about 15 props, 1 ending. The armor begins to move.</p>
+    <div class="tier"><span class="name">Ship</span><div class="bar-track"><div class="bar" style="width:100%;background:#b5481a">10–12 mo · target</div></div></div>
+    <p class="tier-desc">8 nights, 2–3 weapons and a 4-piece living suit of armor, about 22 props, blood toll, save and resume, 2 endings.</p>
+    <div class="tier"><span class="name">Full</span><div class="bar-track"><div class="bar" style="width:100%;background:repeating-linear-gradient(45deg,#2b241e 0 8px,#1d1915 8px 16px)">post-launch</div></div></div>
+    <p class="tier-desc">12 nights, mail, more weapons, 30 props, a third ending.</p>
+  </div>
+</section>
+
+<section class="col">
+  <span class="label">Risks</span>
+  <h2>What could go wrong</h2>
+  <p>Technical director verdict: <span class="verdict v-warn">CONCERNS</span>. Feasible in Unity for 2–3 people; two risks can blow the schedule if treated as open-ended research.</p>
+  <div class="cols">
+    <div>
+      <h3>Technical</h3>
+      <ul class="plain">
+        <li>Hammer deformation that looks right. Plan: a bar shaped by parameters each strike nudges, plus hammer-mark decals. 3–4 week spike.</li>
+        <li>Plate raising for armor is new technology. Spike it in the first 6 weeks.</li>
+        <li>Camera exposure and bloom can distort heat colour. Lock exposure while reading heat.</li>
+        <li>"Unobserved" leaks through shadows and reflections. The game must also track what the player actually saw.</li>
+        <li>Around 8 different gesture systems for one knife. Build one shared framework early.</li>
+        <li>Render pipeline (URP or HDRP) decided by a one-week lighting test once Unity's version is set.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Design and market</h3>
+      <ul class="plain">
+        <li>Forging could get repetitive. Each night adds a technique, and armor adds new processes.</li>
+        <li>Interruptions could feel unfair. Events only fire in critical windows.</li>
+        <li>Players might learn to ignore events. Ignoring them must cost something.</li>
+        <li>Repeated mouse gestures can strain hands. Timing assists from the start.</li>
+        <li>"Like The Mortuary Assistant" promises jump-scares. Store copy will say "procedural dread".</li>
+        <li>Smithing fans may not want horror, and horror fans may not want a sim.</li>
+      </ul>
+    </div>
+  </div>
+  <h3>Open questions</h3>
+  <ul class="plain">
+    <li>Do players hesitate when an event fires mid-quench? The MVP playtest answers this.</li>
+    <li>How should the blood toll feel: a hand tremor, blurred vision, the curse? It is a proposal, tested in the prototype.</li>
+    <li>What does ignoring the horror cost, exactly?</li>
+    <li>How is "perfect" graded, and how do grades map to memories and endings?</li>
+    <li>Who is the stranger, and what is the armor for? The story comes later.</li>
+  </ul>
+</section>
+
+<section class="col">
+  <span class="label">Next steps</span>
+  <h2>The road from here</h2>
+  <ol class="steps">
+    <li><code>/setup-engine</code>: set up Unity and its reference docs</li>
+    <li><code>/prototype</code>: hammer feel and a mid-quench interruption, built fast and thrown away</li>
+    <li><code>/art-bible</code>: turn the visual identity into rules for every asset</li>
+    <li><code>/design-review</code>: check the concept is complete</li>
+    <li><code>/map-systems</code> then <code>/design-system</code>: one design document per system</li>
+    <li><code>/create-architecture</code> and the decisions it lists</li>
+    <li><code>/vertical-slice</code> and <code>/playtest-report</code> before production</li>
+  </ol>
+</section>
+</main>
+
+<footer>
+  <div class="col">
+    <span class="rune">ᚦᛖ ᛚᚨᛋᛏ ᚲᛟᛗᛗᛁᛋᛋᛁᛟᚾ</span>
+    <p class="caption">Draft concept, 31 October 2026. Reviewed by the creative, art and technical directors and the producer. Diagrams are drawn for this page. Photos from Wikimedia Commons, toned darker for this page: forest by Tannenschleicher (public domain); trapper cabin by the U.S. Fish and Wildlife Service (public domain); blacksmith hammering iron by David Whelan (CC0); Asferg runestone by Marie-Lan Nguyen (public domain); close helmet and field armor from The Metropolitan Museum of Art (CC0); smith's workshop by Jorge Royan (CC BY-SA 3.0). Heat and temper temperatures are approximate values for plain carbon steel.</p>
+  </div>
+</footer>
+</body>
+</html>
